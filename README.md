@@ -1,4 +1,4 @@
 protonode.js
 ============
 
-A tool to help in creating hierarchical data structures.
+Helps in creating and traversing trees.
