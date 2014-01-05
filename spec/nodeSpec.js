@@ -70,7 +70,7 @@ describe('Protonode', function(){
 
                     expect( family.parent() ).to.be.undefined;
                     expect( parent.parent() ).to.equal( family )
-                    expect( child.parent() ).to.equal( parent );
+                    expect( child.parent() ).to.equal( parent )
 
                     expect( family.ancestor() ).to.be.undefined
                     expect( parent.ancestor() ).to.equal( family )
@@ -95,6 +95,39 @@ describe('Protonode', function(){
                     expect( family.ancestors() ).to.be.undefined
                     expect( child.ancestors().value() ).to.equal( cousin.ancestors().value() );
                     expect( great.ancestors().size() ).to.equal( 2 )
+                })
+            })
+            describe('Traversal', function(){
+                it("should return itself when traversing from the root", function(){
+                    expect(family.next()).to.equal(family)
+                    expect(family.prev()).to.equal(family)
+                })
+                it("should return it's next sibling when traversing forward", function(){
+                    expect(parent.next()).to.equal(uncle)
+                    expect(child.next()).to.equal(sibling)
+                    expect(grand.next()).to.equal(grand_sibling)
+                }) 
+                it("should return it's previous sibling when traversing backwards", function(){
+                    expect(uncle.prev()).to.equal(parent)
+                    expect(sibling.prev()).to.equal(child)
+                    expect(grand_sibling.prev()).to.equal(grand)
+                })
+                it("should return it's parent when traversing backwards from the head", function(){
+                    expect(great.prev()).to.equal(grand)
+                    expect(parent.prev()).to.equal(family)
+                })
+                it("should return the closet unrelated ancestor when traversing forward from the tail", function(){
+                    expect(great.next()).to.equal(grand_sibling);
+                    expect(grand_sibling.next()).to.equal(sibling);
+                    expect(sibling.next()).to.equal(uncle);
+                })
+                it("should return the root when traversing forward from a leaf node", function(){
+                    expect(great.next()).not.to.equal(family);
+                    expect(grand_sibling.next()).not.to.equal(family)
+                    expect(grand_cousin.next()).not.to.equal(family)
+
+                    expect(uncle.next()).to.equal(family);
+                    expect(cousin.next()).to.equal(family)
                 })
             })
 
