@@ -158,9 +158,9 @@
          * @return {[<Node>]}
          */
     ,   prev: function(){
-            return this.index > 1 && this.siblings()[this.index - 1]
-                || this.parent()         // navigating back returns you to your parent
-                || this                  // must be at root
+            return this.index > 0 && this.siblings().at(this.index-1).first()
+                || this.parent() && this.parent()  // navigating back returns you to your parent
+                || this                            // must be at root
         }
 
         /**
@@ -170,8 +170,8 @@
          * @return {Function}
          */
     ,   next: function(){
-            return this.index < this.siblings().length && this.siblings()[this.index+1]
-                || this.parent().next()
+            return this.index < this.siblings().size() && this.siblings().at(this.index+1).first()
+                || this.parent() && this.parent().next() //navigating forward returns your parents next sibling
                 || this
         }
 
