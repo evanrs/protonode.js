@@ -174,7 +174,14 @@
                 || this.parent() && this.parent().next() //navigating forward returns your parents next sibling
                 || this
         }
-
+        /**
+         * Compares provided string to node type
+         * @param  {String}  type 
+         * @return {Boolean}      
+         */
+    ,   is: function( type ){
+            return this.type === type;
+        }
         /**
          * Constructs a child of this <NodeType> with the given properties
          * @param {Object|<Node>} node properties
