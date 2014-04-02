@@ -6,7 +6,7 @@
      else
          window.Protonode = Protonode( _ );
 })( function( _ ){
-
+    
     /**
      * Node constructor
      * @param {Object} options
@@ -120,7 +120,9 @@
          */
     ,   ancestor: function( type ){
             var ancestor = this.parent()
-            while( type !== void 0 && ancestor !== void 0 && ancestor.getType() !== type ){
+
+            while( type !== void 0 && ancestor !== void 0 && ancestor.getType() !== type 
+                || type === void 0 && ancestor !== void 0){
                 ancestor.parent() && ( ancestor = ancestor.parent() )
             }
             return ancestor
@@ -149,6 +151,14 @@
                 }, _([]) )
             }
             return descendants
+        }
+
+        /**
+         * Returns the index of the current node relative to it's siblings
+         * @return {int} index
+         */
+    ,   indexOf: function(){
+            return this.siblings().indexOf(this)
         }
 
         /**
