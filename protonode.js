@@ -17,13 +17,6 @@
         if (!(this instanceof this.constructor)){
             return new (this.constructor)(args);
         }
-        
-        /**
-         * Avoid cyclical structures
-         * @return {Node}
-         */
-        this.__parent   = _.constant(parent)
-        this.__children = []
 
         Object.defineProperty(this, "type", {
             value: options && options.type || this.constructor.type
@@ -33,9 +26,32 @@
 
         this.__id = _.uniqueId(this.type)
 
+        adopt(this, parent)
+
         this.initialize( 
             _.omit(options, ['__id', '__children', 'children', '__parent', 'parent'])
         )
+        
+    }
+
+    /**
+     * Creates relationship between node and parent
+     * @param  {<Node>} parent the parent node receiving the child
+     * @param  {<Node>} child  the node to associate to the parent
+     * @return {<Node>}        the child node
+     */
+    function adopt(child, parent){
+        // TODO TEST remove child from former parent if any
+        // if( child.__parent && child.__parent()) 
+        //     child.__parent().children().remove(child)
+        /**
+         * Avoid cyclical structures
+         * @return {Node}
+         */
+        child.__parent   = _.constant(parent)
+        child.__children = []
+
+        return child;
     }
 
     /**
@@ -52,8 +68,24 @@
          * @type {String}
          */
     ,   type: 'node'
+        /**
+         * A where function adapted to accept a string which matches on type
+         * @param  {[<Node>]} collection a collection of nodes
+         * @param  {String|Object} condition  a string searching on type or an 
+         *                                    object to pass to .where
+         * @return {[<Node>]}            a filter array of nodes
+         */
+    ,   where: function(collection, condition){
+            if(!_.isEmpty(condition) && !_.isEmpty(condition))
+                if(_.isString(condition))
+                    condition = {type:condition}
+                if(_.isObject(condition))
+                    collection = collection.where(condition)
+            return collection;
+        }
     })
 
+    
     /**
      * Instance properities and methods
      */
@@ -101,16 +133,17 @@
          * Returns children of node
          * @return {[<Node>]}
          */
-    ,   children: function(){
-            return _(this.__children);
+    ,   children: function(condition){
+            return Node.where(_(this.__children), condition);
         }
 
         /**
          * Returns current node and it's siblings
          * @return {[<Node>]}
          */
-    ,   siblings: function(){
-            return this.parent() && this.parent().children() || _([this]);
+    ,   siblings: function(condition){
+            return this.parent() && this.parent().children(condition) 
+                || Node.where(_([this]), condition);
         }
 
         /**
@@ -168,7 +201,8 @@
          * @return {[<Node>]}
          */
     ,   prev: function(){
-            return this.index > 0 && this.siblings().at(this.index-1).first()
+            var index = this.indexOf(this);
+            return index > 0 && this.siblings().at(index-1).first()
                 || this.parent() && this.parent()  // navigating back returns you to your parent
                 || this                            // must be at root
         }
@@ -180,7 +214,8 @@
          * @return {Function}
          */
     ,   next: function(){
-            return this.index < this.siblings().size() && this.siblings().at(this.index+1).first()
+            var index = this.indexOf(this);
+            return index < this.siblings().size() && this.siblings().at(index+1).first()
                 || this.parent() && this.parent().next() //navigating forward returns your parents next sibling
                 || this
         }
@@ -193,16 +228,33 @@
             return this.type === type;
         }
         /**
+         * Take on child and set child's parent to this
+         * @param  {<Node>} node a protonode
+         * @return {<Node>}      the parent node
+         */
+    ,   adopt: function( node ){
+            if( node instanceof Protonode ){
+                adopt(node, this)
+                this.__children.push(node)
+                return this
+            }
+            return false
+        }
+
+        /**
          * Constructs a child of this <NodeType> with the given properties
          * @param {Object|<Node>} node properties
          * @return {<Node>} returns new node
          */
     ,   add: function( node, options ){
-            if( _.isObject(node) )
+            if( _.isObject(node) ){
+                var constructor = node instanceof Protonode? node.constructor
+                    :   this.constructor.child || this.constructor
                 this.__children.push(
                     (   node.index = this.__children.length
-                    ,   node = new  (this.constructor.child || this.constructor)( node, this )   )
+                    ,   node = new  (constructor)( node, this )   )
                 )
+            }
             else throw new Error("Node.add received an invalid value");
             return node;
         }
