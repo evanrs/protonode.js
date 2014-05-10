@@ -177,6 +177,18 @@
          * @return {[type]}
          */
     ,   descendants: function( type ){
+            if( _.isObject(type) || _.isFunction(type) ){
+                if( type === void 0 ) return this.children()
+                var descendants = _([this])
+                ,   nodes = _([]);
+                while( descendants.size() && descendants.first() ){
+                    descendants = descendants.reduce(function(child, sibling){
+                        return child.concat( sibling.children().value() )
+                    }, _([]) )
+                    nodes = nodes.concat(descendants.where(type).value())
+                }
+                return nodes;
+            }
             var descendants = this.children();
             while( type !== void 0 && descendants.size() && descendants.first() && !descendants.find({type:type}) ){
                 descendants = descendants.reduce(function(child, sibling){
