@@ -152,11 +152,13 @@
          * @return {<Node>}
          */
     ,   ancestor: function( type ){
-            var ancestor = this.parent()
+            var ancestor, parent = ancestor = this.parent();
 
-            while( type !== void 0 && ancestor !== void 0 && ancestor.getType() !== type 
-                || type === void 0 && ancestor !== void 0){
-                ancestor.parent() && ( ancestor = ancestor.parent() )
+            while( type !== void 0 && parent !== void 0 && parent.getType() !== type 
+                || type === void 0 && parent !== void 0){
+                parent = parent.parent()
+                parent && ( ancestor = parent )
+
             }
             return ancestor
         }
