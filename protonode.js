@@ -1,3 +1,4 @@
+
 (function( Protonode ){
      if (typeof define == 'function' && typeof define.amd == 'object' && define.amd)
          define( 'protonode', ['lodash'], Protonode);
@@ -6,6 +7,7 @@
      else
          window.Protonode = Protonode( _ );
 })( function( _ ){
+    'use strict';
     
     /**
      * Node constructor
