@@ -1,6 +1,6 @@
 {
   "name": "protonode",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Helps in creating and traversing trees.",
   "main": "protonode.js",
   "scripts": {
